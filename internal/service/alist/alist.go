@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -111,6 +112,17 @@ func (alistServer *AlistServer) authLogin() (string, error) {
 	return authLoginResponse.Data.Token, nil
 }
 
+func UrlEncode(str string) string {
+	return url.QueryEscape(str)
+}
+func UrlDecode(str string) string {
+	res, err := url.QueryUnescape(str)
+	if err != nil {
+		return ""
+	}
+	return res
+}
+
 // 获取某个文件/目录信息
 func (alistServer *AlistServer) FsGet(path string) (FsGetData, error) {
 	var (
@@ -119,7 +131,7 @@ func (alistServer *AlistServer) FsGet(path string) (FsGetData, error) {
 		funcInfo          = "Alist获取某个文件/目录信息"
 		url               = alistServer.GetEndpoint() + "/api/fs/get"
 		method            = "POST"
-		payload           = strings.NewReader(fmt.Sprintf(`{"path": "%s","password": "","page": 1,"per_page": 0,"refresh": false}`, path))
+		payload           = strings.NewReader(fmt.Sprintf(`{"path": "%s","password": "","page": 1,"per_page": 0,"refresh": false}`, UrlDecode(path)))
 	)
 
 	// 未从缓存池中读取到数据
